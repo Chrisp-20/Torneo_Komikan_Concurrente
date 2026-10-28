@@ -1,4 +1,4 @@
-#Torneo de Komikan Concurrente
+# Torneo de Komikan Concurrente
 Tarea 2 - Benjamín Paredes - Christián Pereira
 
 Compilar con:

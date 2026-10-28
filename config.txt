@@ -1,0 +1,3 @@
+min_ms 50
+max_ms 300
+seed 42
