@@ -1,0 +1,14 @@
+seed 5
+puma 8
+perro 3
+perro 4
+perro 5
+perro 6
+perro 7
+perro 9
+perro 10
+perro 11
+perro 12
+perro 13
+perro 14
+perro 16
