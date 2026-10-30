@@ -51,13 +51,20 @@ void leer_config(string archivo) {
     }
     string nombre;
     int valor;
-    while (f >> nombre >> valor) {
+       while (f >> nombre >> valor) {
         if (nombre == "min_ms") {
             min_ms = valor;
         } else if (nombre == "max_ms") {
             max_ms = valor;
         } else if (nombre == "seed") {
             seed = valor;
+        } else if (nombre == "puma") {
+            puma_pos = valor;
+        } else if (nombre == "perro") {
+            if (cant_perros < 12) {
+                perros_pos[cant_perros] = valor;
+            }
+            cant_perros++;
         }
     }
 }
