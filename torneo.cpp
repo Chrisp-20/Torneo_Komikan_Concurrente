@@ -69,6 +69,42 @@ void leer_config(string archivo) {
     }
 }
 
+// muestra un error y termina el programa
+void error_disposicion(string mensaje) {
+    cout << "Disposición invalida: " << mensaje << endl;
+    exit(1);
+}
+
+// revisa que la disposición del config este bien
+void validar_disposicion() {
+    // si el config no trae fichas, se usa la posición fija
+    if (puma_pos == -1 && cant_perros == 0) {
+        return;
+    }
+
+    if (puma_pos < 0 || puma_pos > 27) {
+        error_disposicion("el puma debe estar en un nodo de 0 a 27");
+    }
+    if (cant_perros != 12) {
+        error_disposicion("tienen que ser exactamente 12 perros");
+    }
+
+    int usado[28] = {0};
+    usado[puma_pos] = 1;
+    for (int i = 0; i < 12; i++) {
+        int p = perros_pos[i];
+        if (p < 0 || p > 27) {
+            error_disposicion("los perros deben estar en nodos de 0 a 27");
+        }
+        if (usado[p]) {
+            error_disposicion("hay dos fichas en el nodo " + to_string(p));
+        }
+        usado[p] = 1;
+    }
+
+    usar_config = 1;
+}
+
 // se conecta ambos nodos en los dos sentidoss
 void conectar(int a, int b) {
     ady[a][b] = 1;
@@ -242,6 +278,8 @@ int main(int argc, char *argv[]) {
         cout << "Retardos invalidos: min_ms debe ser >= 0 y <= max_ms" << endl;
         return 1;
     }
+
+    validar_disposicion();
 
     srand(seed);
 
