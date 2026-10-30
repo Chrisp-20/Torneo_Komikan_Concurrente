@@ -1,3 +1,16 @@
 min_ms 50
 max_ms 300
 seed 42
+puma 15
+perro 13
+perro 17
+perro 18
+perro 19
+perro 20
+perro 21
+perro 22
+perro 23
+perro 24
+perro 25
+perro 26
+perro 27
