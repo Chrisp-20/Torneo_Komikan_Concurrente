@@ -23,16 +23,18 @@ pthread_cond_t not_full = PTHREAD_COND_INITIALIZER;
 pthread_cond_t not_empty = PTHREAD_COND_INITIALIZER;
 pthread_mutex_t mutex_cola = PTHREAD_MUTEX_INITIALIZER;
 
-// mesas
 sem_t mesas;
 pthread_mutex_t mutex_mesas = PTHREAD_MUTEX_INITIALIZER;
 int *mesa_ocupada;
 pthread_t *jueces;
 
+int ady[28][28];
+
 struct Partida {
     int mesa;
     int jugador_puma;
     int jugador_perros;
+    int tablero[28]; 
 };
 
 void leer_config(string archivo) {
@@ -52,6 +54,78 @@ void leer_config(string archivo) {
             seed = valor;
         }
     }
+}
+
+// se conecta ambos nodos en los dos sentidoss
+void conectar(int a, int b) {
+    ady[a][b] = 1;
+    ady[b][a] = 1;
+}
+
+// se arman las conexiones en el tablero
+void armar_conexiones() {
+    for (int fila = 0; fila < 5; fila++) {
+        for (int col = 0; col < 5; col++) {
+            int n = 3 + fila * 5 + col;
+            if (col < 4) {
+                conectar(n, n + 1);
+            }
+            if (fila < 4) {
+                conectar(n, n + 5);
+            }
+        }
+    }
+
+    // el triangulo de arriba
+    conectar(0, 1);
+    conectar(0, 2);
+    conectar(1, 2);
+    conectar(0, 5);
+    conectar(1, 3);
+    conectar(1, 4);
+    conectar(2, 6);
+    conectar(2, 7);
+}
+
+// se ponen las fichas en su posición inicial 
+void poner_fichas(int *tablero) {
+    for (int i = 0; i < 28; i++) {
+        tablero[i] = 0;
+    }
+
+    // se posiciona el puma al centro
+    tablero[15] = 1;
+
+    // los 12 perros
+    tablero[13] = 2;
+    tablero[17] = 2;
+    for (int i = 18; i < 28; i++) {
+        tablero[i] = 2;
+    }
+}
+
+// devuelve el simbolo de un nodo
+char simbolo(int *tablero, int n) {
+    if (tablero[n] == 1) {
+        return 'P';
+    }
+    if (tablero[n] == 2) {
+        return 'D';
+    }
+    return '.';
+}
+
+void imprimir_tablero(int mesa, int *tablero) {
+    string s = "Mesa " + to_string(mesa) + ":\n";
+    s = s + "      " + simbolo(tablero, 0) + "\n";
+    s = s + "    " + simbolo(tablero, 1) + "   " + simbolo(tablero, 2) + "\n";
+    for (int fila = 0; fila < 5; fila++) {
+        for (int col = 0; col < 5; col++) {
+            s = s + simbolo(tablero, 3 + fila * 5 + col) + " ";
+        }
+        s = s + "\n";
+    }
+    printf("%s", s.c_str());
 }
 
 void enqueue(int n) {
@@ -93,6 +167,9 @@ void *juez(void *arg) {
     printf("Mesa %d: Puma=jugador %d, Perros=jugador %d\n",
            p->mesa, p->jugador_puma, p->jugador_perros);
 
+    poner_fichas(p->tablero);
+    imprimir_tablero(p->mesa, p->tablero);
+
     usleep(500000); // aqui va la partida de verdad
 
     printf("Mesa %d: termino\n", p->mesa);
@@ -110,7 +187,7 @@ void *matchmaker(void *arg) {
         int a = saca_jugador();
         int b = saca_jugador();
 
-        sem_wait(&mesas); // si las M mesas estan ocupadas, espera aqui
+        sem_wait(&mesas); 
 
         pthread_mutex_lock(&mutex_mesas);
         int m = 0;
@@ -156,9 +233,11 @@ int main(int argc, char *argv[]) {
     srand(seed);
 
     cout << "Jugadores (N): " << N << endl;
-    cout << "Mesas maximas (M): " << M << endl;
+    cout << "Mesas máximas (M): " << M << endl;
     cout << "Retardo: " << min_ms << " a " << max_ms << " ms" << endl;
-    cout << "Seed: " << seed << endl;
+    cout << "Semilla: " << seed << endl;
+
+    armar_conexiones();
 
     mesa_ocupada = (int *)calloc(M, sizeof(int));
     jueces = (pthread_t *)malloc((N / 2 + 1) * sizeof(pthread_t));
@@ -177,7 +256,7 @@ int main(int argc, char *argv[]) {
         pthread_join(jueces[k], NULL);
     }
     if (N % 2 == 1) {
-        cout << "Quedo 1 jugador sin pareja" << endl;
+        cout << "Quedó 1 jugador sin pareja" << endl;
     }
 
     sem_destroy(&mesas);
