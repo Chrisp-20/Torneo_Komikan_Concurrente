@@ -141,6 +141,14 @@ void poner_fichas(int *tablero) {
     for (int i = 0; i < 28; i++) {
         tablero[i] = 0;
     }
+    // si el config trae la disposición, se usa esa
+    if (usar_config) {
+        tablero[puma_pos] = 1;
+        for (int i = 0; i < 12; i++) {
+            tablero[perros_pos[i]] = 2;
+        }
+        return;
+    }
 
     // se posiciona el puma al centro
     tablero[15] = 1;
