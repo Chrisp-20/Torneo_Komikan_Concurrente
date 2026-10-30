@@ -30,6 +30,12 @@ pthread_t *jueces;
 
 int ady[28][28];
 
+// disposición inicial de las fichas que viene desde el config
+int puma_pos = -1;
+int perros_pos[12];
+int cant_perros = 0;
+int usar_config = 0; 
+
 struct Partida {
     int mesa;
     int jugador_puma;
