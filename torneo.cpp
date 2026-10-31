@@ -270,6 +270,57 @@ void revisar_victoria(Partida *p) {
     }
 }
 
+
+// el puma salta si puede, y si no da un paso
+void mover_puma(Partida *p, Ficha *f) {
+    int desde = p->pos_puma;
+    int sobre[28], aterriza[28], saltos = 0;
+    int pasos[28], cuantos = 0;
+
+    for (int v = 0; v < 28; v++) {
+        if (!ady[desde][v]) {
+            continue;
+        }
+        if (p->tablero[v] == 0) {
+            pasos[cuantos] = v;
+            cuantos++;
+        } else if (p->tablero[v] == 2) {
+            int c = destino_salto(desde, v);
+            if (c != -1 && p->tablero[c] == 0) {
+                sobre[saltos] = v;
+                aterriza[saltos] = c;
+                saltos++;
+            }
+        }
+    }
+
+    if (saltos > 0) {
+        int k = rand_r(&f->semilla) % saltos;
+        int v = sobre[k];
+        int c = aterriza[k];
+        for (int i = 0; i < 12; i++) {
+            if (p->vivo[i] && p->pos_perro[i] == v) {
+                p->vivo[i] = 0;
+            }
+        }
+        p->tablero[desde] = 0;
+        p->tablero[v] = 0;
+        p->tablero[c] = 1;
+        p->pos_puma = c;
+        p->capturas++;
+        p->movs++;
+        printf("Mesa %d: el puma salta de %d a %d y captura el perro de %d (capturas: %d)\n",
+               p->mesa, desde, c, v, p->capturas);
+    } else if (cuantos > 0) {
+        int c = pasos[rand_r(&f->semilla) % cuantos];
+        p->tablero[desde] = 0;
+        p->tablero[c] = 1;
+        p->pos_puma = c;
+        p->movs++;
+        printf("Mesa %d: el puma va de %d a %d\n", p->mesa, desde, c);
+    }
+}
+
 void enqueue(int n) {
     cola[tail] = n;
     tail = (tail + 1) % BUFFER_SIZE;
