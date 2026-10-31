@@ -30,11 +30,12 @@ pthread_t *jueces;
 
 int ady[28][28];
 
-// disposición inicial de las fichas que viene desde el config
+// disposición inicial de las fichas que vienen desde el config
 int puma_pos = -1;
 int perros_pos[12];
 int cant_perros = 0;
 int usar_config = 0; 
+int abandona_id = -1; // jugador que abandona la partida (-1 = ninguno)
 
 struct Partida {
     int mesa;
@@ -77,9 +78,11 @@ void leer_config(string archivo) {
             puma_pos = valor;
         } else if (nombre == "perro") {
             if (cant_perros < 12) {
-                perros_pos[cant_perros] = valor;
+            perros_pos[cant_perros] = valor;
             }
             cant_perros++;
+        } else if (nombre == "abandona") {
+            abandona_id = valor;
         }
     }
 }
