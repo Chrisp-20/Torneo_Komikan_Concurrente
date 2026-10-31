@@ -175,28 +175,34 @@ int destino_salto(int a, int b) {
 
 
 // se ponen las fichas en su posición inicial 
-void poner_fichas(int *tablero) {
+void poner_fichas(Partida *p) {
     for (int i = 0; i < 28; i++) {
-        tablero[i] = 0;
+        p->tablero[i] = 0;
     }
     // si el config trae la disposición, se usa esa
     if (usar_config) {
-        tablero[puma_pos] = 1;
+        p->pos_puma = puma_pos;
         for (int i = 0; i < 12; i++) {
-            tablero[perros_pos[i]] = 2;
+            p->pos_perro[i] = perros_pos[i];
         }
-        return;
+    } else {
+        // el puma al centro
+        p->pos_puma = 15;
+        // los 12 perros
+        p->pos_perro[0] = 13;
+        p->pos_perro[1] = 17;
+        for (int i = 2; i < 12; i++) {
+            p->pos_perro[i] = 16 + i;
+        }
     }
-
-    // se posiciona el puma al centro
-    tablero[15] = 1;
-
-    // los 12 perros
-    tablero[13] = 2;
-    tablero[17] = 2;
-    for (int i = 18; i < 28; i++) {
-        tablero[i] = 2;
+    p->tablero[p->pos_puma] = 1;
+    for (int i = 0; i < 12; i++) {
+        p->tablero[p->pos_perro[i]] = 2;
+        p->vivo[i] = 1;
     }
+    p->capturas = 0;
+    p->terminada = 0;
+    p->movs = 0;
 }
 
 // devuelve el simbolo de un nodo
@@ -262,7 +268,7 @@ void *juez(void *arg) {
     printf("Mesa %d: Puma=jugador %d, Perros=jugador %d\n",
            p->mesa, p->jugador_puma, p->jugador_perros);
 
-    poner_fichas(p->tablero);
+    poner_fichas(p);
     imprimir_tablero(p->mesa, p->tablero);
 
     usleep(500000); // aqui va la partida de verdad
