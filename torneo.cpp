@@ -250,6 +250,18 @@ int puma_acorralado(Partida *p) {
     return 1;
 }
 
+// mira si alguien gano (con el mutex de la mesa tomado)
+void revisar_victoria(Partida *p) {
+    if (p->terminada) {
+        return;
+    }
+    if (p->capturas >= 6) {
+        p->terminada = 1;
+    } else if (puma_acorralado(p)) {
+        p->terminada = 2;
+    }
+}
+
 void enqueue(int n) {
     cola[tail] = n;
     tail = (tail + 1) % BUFFER_SIZE;
