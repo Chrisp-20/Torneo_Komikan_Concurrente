@@ -447,7 +447,17 @@ void *juez(void *arg) {
         pthread_join(hilos[i], NULL);
     }
 
-    printf("Mesa %d: termino\n", p->mesa);
+    imprimir_tablero(p->mesa, p->tablero);
+    if (p->terminada == 1) {
+        printf("Mesa %d: gana el Puma (jugador %d) con %d capturas, %d movimientos\n",
+               p->mesa, p->jugador_puma, p->capturas, p->movs);
+    } else {
+        printf("Mesa %d: ganan los Perros (jugador %d), el puma quedo acorralado, %d movimientos\n",
+               p->mesa, p->jugador_perros, p->movs);
+    }
+
+   
+ printf("Mesa %d: termino\n", p->mesa);
     pthread_mutex_destroy(&p->mutex);
     pthread_mutex_lock(&mutex_mesas);
     mesa_ocupada[p->mesa] = 0;
