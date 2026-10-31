@@ -47,8 +47,9 @@ struct Partida {
     int pos_perro[12];
     int vivo[12];
     int capturas;
-    int terminada;           // 0 sigue, 1 gana el puma, 2 ganan los perros
+    int terminada;           // 0 sigue, 1 gana el puma, 2 ganan los perros, 3 abandona el jugador del puma y 4 abandona el de los perros
     int movs;
+    int abandona;            // 0 nadie, 1 abandona el jugador del puma, 2 el de los perros
 };
 
 // datos que recibe cada hilo de ficha
@@ -489,6 +490,13 @@ void *matchmaker(void *arg) {
         p->mesa = m;
         p->jugador_puma = a;
         p->jugador_perros = b;
+        p->abandona = 0;
+        if (a == abandona_id) {
+            p->abandona = 1;
+        }
+        if (b == abandona_id) {
+            p->abandona = 2;
+        }
         pthread_create(&jueces[k], NULL, juez, p);
     }
     return NULL;
