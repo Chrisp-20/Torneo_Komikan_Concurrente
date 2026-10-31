@@ -229,6 +229,27 @@ void imprimir_tablero(int mesa, int *tablero) {
     printf("%s", s.c_str());
 }
 
+// 1 si el puma no tiene ni un paso ni un salto posible
+// (se llama con el mutex de la mesa tomado)
+int puma_acorralado(Partida *p) {
+    int desde = p->pos_puma;
+    for (int v = 0; v < 28; v++) {
+        if (!ady[desde][v]) {
+            continue;
+        }
+        if (p->tablero[v] == 0) {
+            return 0;
+        }
+        if (p->tablero[v] == 2) {
+            int c = destino_salto(desde, v);
+            if (c != -1 && p->tablero[c] == 0) {
+                return 0;
+            }
+        }
+    }
+    return 1;
+}
+
 void enqueue(int n) {
     cola[tail] = n;
     tail = (tail + 1) % BUFFER_SIZE;
