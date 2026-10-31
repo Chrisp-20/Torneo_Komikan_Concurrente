@@ -38,11 +38,11 @@ perro 18
 - `puma`: nodo donde parte el puma
 - `perro`: nodo donde parte un perro (se escribe una linea por cada uno, tienen que ser 12)
 Si el archivo no trae `puma` ni `perro`, o no se entrega config, se usa una
-posicion inicial fija (puma al centro y perros abajo). Si trae la disposicion pero
+posicion inicial fija (puma al centro y perros abajo). Si trae la disposición pero
 esta mal (nodo fuera del tablero, no son 12 perros o dos fichas en el mismo nodo),
 el programa avisa y termina.
  
-Hay un ejemplo con otra disposicion en `config_prueba.txt`.
+Hay un ejemplo con otra disposición en `config_prueba.txt`.
  
 ## Tablero
  

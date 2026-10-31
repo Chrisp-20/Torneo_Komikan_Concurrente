@@ -262,7 +262,7 @@ int puma_acorralado(Partida *p) {
     return 1;
 }
 
-// mira si alguien gano (con el mutex de la mesa tomado)
+// mira si alguien ganó (con el mutex de la mesa tomado)
 void revisar_victoria(Partida *p) {
     if (p->terminada) {
         return;
@@ -440,6 +440,13 @@ void *juez(void *arg) {
     while (!fin) {
         usleep(500000);
         pthread_mutex_lock(&p->mutex);
+        if (p->abandona != 0 && !p->terminada) { // si uno de los jugadores falla, gana el otro por abandono
+            if (p->abandona == 1) {
+                p->terminada = 3;
+            } else {
+                p->terminada = 4;
+            }
+        }
         fin = p->terminada;
         if (!fin) {
             imprimir_tablero(p->mesa, p->tablero);
@@ -455,9 +462,15 @@ void *juez(void *arg) {
     if (p->terminada == 1) {
         printf("Mesa %d: gana el Puma (jugador %d) con %d capturas, %d movimientos\n",
                p->mesa, p->jugador_puma, p->capturas, p->movs);
-    } else {
+    } else if (p->terminada == 2) {
         printf("Mesa %d: ganan los Perros (jugador %d), el puma quedo acorralado, %d movimientos\n",
                p->mesa, p->jugador_perros, p->movs);
+    } else if (p->terminada == 3) {
+        printf("Mesa %d: el jugador %d (Puma) abandonó, gana el jugador %d (Perros) por abandonó\n",
+               p->mesa, p->jugador_puma, p->jugador_perros);
+    } else {
+        printf("Mesa %d: el jugador %d (Perros) abandonó, gana el jugador %d (Puma) por abandonó\n",
+               p->mesa, p->jugador_perros, p->jugador_puma);
     }
 
    
