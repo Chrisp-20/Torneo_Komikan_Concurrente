@@ -40,7 +40,14 @@ struct Partida {
     int mesa;
     int jugador_puma;
     int jugador_perros;
-    int tablero[28]; 
+    int tablero[28];
+    pthread_mutex_t mutex;   // un mutex por mesa
+    int pos_puma;
+    int pos_perro[12];
+    int vivo[12];
+    int capturas;
+    int terminada;           // 0 sigue, 1 gana el puma, 2 ganan los perros
+    int movs;
 };
 
 void leer_config(string archivo) {
