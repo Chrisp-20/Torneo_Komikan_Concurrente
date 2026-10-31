@@ -321,6 +321,29 @@ void mover_puma(Partida *p, Ficha *f) {
     }
 }
 
+// el perro elige al azar entre los nodos vecinos que esten libres
+void mover_perro(Partida *p, Ficha *f) {
+    int desde = p->pos_perro[f->num];
+    int libres[28], cuantos = 0;
+
+    for (int v = 0; v < 28; v++) {
+        if (ady[desde][v] && p->tablero[v] == 0) {
+            libres[cuantos] = v;
+            cuantos++;
+        }
+    }
+    if (cuantos == 0) {
+        return;
+    }
+    int c = libres[rand_r(&f->semilla) % cuantos];
+    p->tablero[desde] = 0;
+    p->tablero[c] = 2;
+    p->pos_perro[f->num] = c;
+    p->movs++;
+    printf("Mesa %d: el perro %d va de %d a %d\n", p->mesa, f->num, desde, c);
+}
+
+
 void enqueue(int n) {
     cola[tail] = n;
     tail = (tail + 1) % BUFFER_SIZE;
