@@ -344,6 +344,31 @@ void mover_perro(Partida *p, Ficha *f) {
 }
 
 
+// hilo de una ficha: duerme un rato, toma el mutex de la mesa e intenta moverse
+void *ficha(void *arg) {
+    Ficha *f = (Ficha *)arg;
+    Partida *p = f->p;
+
+    while (1) {
+        int ms = min_ms + rand_r(&f->semilla) % (max_ms - min_ms + 1);
+        usleep(ms * 1000);
+
+        pthread_mutex_lock(&p->mutex);
+        if (p->terminada || (f->tipo == 2 && !p->vivo[f->num])) {
+            pthread_mutex_unlock(&p->mutex);
+            break;
+        }
+        if (f->tipo == 1) {
+            mover_puma(p, f);
+        } else {
+            mover_perro(p, f);
+        }
+        revisar_victoria(p);
+        pthread_mutex_unlock(&p->mutex);
+    }
+    return NULL;
+}
+
 void enqueue(int n) {
     cola[tail] = n;
     tail = (tail + 1) % BUFFER_SIZE;
