@@ -466,10 +466,10 @@ void *juez(void *arg) {
         printf("Mesa %d: ganan los Perros (jugador %d), el puma quedo acorralado, %d movimientos\n",
                p->mesa, p->jugador_perros, p->movs);
     } else if (p->terminada == 3) {
-        printf("Mesa %d: el jugador %d (Puma) abandonó, gana el jugador %d (Perros) por abandonó\n",
+        printf("Mesa %d: el jugador %d (Puma) abandonó, gana el jugador %d (Perros) por abandono\n",
                p->mesa, p->jugador_puma, p->jugador_perros);
     } else {
-        printf("Mesa %d: el jugador %d (Perros) abandonó, gana el jugador %d (Puma) por abandonó\n",
+        printf("Mesa %d: el jugador %d (Perros) abandonó, gana el jugador %d (Puma) por abandono\n",
                p->mesa, p->jugador_perros, p->jugador_puma);
     }
 
