@@ -136,6 +136,37 @@ void armar_conexiones() {
     conectar(2, 7);
 }
 
+
+// si el puma esta en a y el perro en b, devuelve el nodo donde cae
+// al saltar en linea recta, o -1 si no hay
+int destino_salto(int a, int b) {
+    // saltos en linea recta que pasan por el triangulo: origen, sobre, destino
+    int triangulo[10][3] = {
+        {0, 5, 10}, {10, 5, 0},
+        {0, 1, 3}, {3, 1, 0},
+        {0, 2, 7}, {7, 2, 0},
+        {1, 4, 9}, {9, 4, 1},
+        {2, 6, 11}, {11, 6, 2}
+    };
+    for (int i = 0; i < 10; i++) {
+        if (a == triangulo[i][0] && b == triangulo[i][1]) {
+            return triangulo[i][2];
+        }
+    }
+    if (a < 3 || b < 3) {
+        return -1;
+    }
+    int c = b + (b - a);
+    if (c < 3 || c > 27) {
+        return -1;
+    }
+    if (ady[b][c]) {
+        return c;
+    }
+    return -1;
+}
+
+
 // se ponen las fichas en su posición inicial 
 void poner_fichas(int *tablero) {
     for (int i = 0; i < 28; i++) {
