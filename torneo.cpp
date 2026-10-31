@@ -408,12 +408,47 @@ void *juez(void *arg) {
     printf("Mesa %d: Puma=jugador %d, Perros=jugador %d\n",
            p->mesa, p->jugador_puma, p->jugador_perros);
 
+    pthread_mutex_init(&p->mutex, NULL);
     poner_fichas(p);
     imprimir_tablero(p->mesa, p->tablero);
 
-    usleep(500000); // aqui va la partida de verdad
+    // por si el config deja al puma acorralado desde el inicio
+    revisar_victoria(p);
+
+    // un hilo para el puma y uno por cada perro
+    Ficha fichas[13];
+    pthread_t hilos[13];
+    for (int i = 0; i < 13; i++) {
+        fichas[i].p = p;
+        if (i == 0) {
+            fichas[i].tipo = 1;
+            fichas[i].num = 0;
+        } else {
+            fichas[i].tipo = 2;
+            fichas[i].num = i - 1;
+        }
+        fichas[i].semilla = seed + p->jugador_puma * 100 + i;
+        pthread_create(&hilos[i], NULL, ficha, &fichas[i]);
+    }
+
+    // cada medio segundo muestra el tablero hasta que alguien gane
+    int fin = 0;
+    while (!fin) {
+        usleep(500000);
+        pthread_mutex_lock(&p->mutex);
+        fin = p->terminada;
+        if (!fin) {
+            imprimir_tablero(p->mesa, p->tablero);
+        }
+        pthread_mutex_unlock(&p->mutex);
+    }
+
+    for (int i = 0; i < 13; i++) {
+        pthread_join(hilos[i], NULL);
+    }
 
     printf("Mesa %d: termino\n", p->mesa);
+    pthread_mutex_destroy(&p->mutex);
     pthread_mutex_lock(&mutex_mesas);
     mesa_ocupada[p->mesa] = 0;
     pthread_mutex_unlock(&mutex_mesas);
@@ -421,6 +456,7 @@ void *juez(void *arg) {
     sem_post(&mesas);
     return NULL;
 }
+
 
 void *matchmaker(void *arg) {
     (void)arg;
