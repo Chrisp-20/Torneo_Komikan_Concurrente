@@ -50,6 +50,14 @@ struct Partida {
     int movs;
 };
 
+// datos que recibe cada hilo de ficha
+struct Ficha {
+    Partida *p;
+    int tipo;                // 1 puma, 2 perro
+    int num;                 // numero del perro (0 a 11)
+    unsigned int semilla;
+};
+
 void leer_config(string archivo) {
     ifstream f(archivo);
     if (!f) {
