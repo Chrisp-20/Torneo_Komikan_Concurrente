@@ -633,12 +633,19 @@ int main(int argc, char *argv[]) {
     for (int k = 0; k < N / 2; k++) {
         pthread_join(jueces[k], NULL);
     }
-    if (N % 2 == 1) {
+    if (N % 2 == 1 && !terminar) {
         cout << "Quedó 1 jugador sin pareja" << endl;
     }
 
     sem_destroy(&mesas);
+    pthread_mutex_destroy(&mutex_cola);
+    pthread_mutex_destroy(&mutex_mesas);
+    pthread_cond_destroy(&not_full);
+    pthread_cond_destroy(&not_empty);
     free(mesa_ocupada);
     free(jueces);
+    if (terminar) {
+        cout << "Ctrl+C: recursos liberados, fin del torneo" << endl;
+    }
     return 0;
 }
