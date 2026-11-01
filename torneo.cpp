@@ -613,9 +613,20 @@ int main(int argc, char *argv[]) {
 
     pthread_sigmask(SIG_UNBLOCK, &mascara, NULL);
 
-    for (int i = 0; i < N; i++) {
+    for (int i = 0; i < N && !terminar; i++) {
         usleep((rand() % 20) * 1000); // los jugadores llegan de a poco
+        if (terminar) {
+            break;
+        }
         llega_jugador(i);
+    }
+
+    if (terminar) {
+        cout << "Ctrl+C: no llegan más jugadores, las partidas terminan ordenadamente" << endl;
+        // despierta al matchmaker si es que estaba esperando jugadores
+        pthread_mutex_lock(&mutex_cola);
+        pthread_cond_broadcast(&not_empty);
+        pthread_mutex_unlock(&mutex_cola);
     }
 
     pthread_join(mm, NULL);
