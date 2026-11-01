@@ -398,8 +398,13 @@ int dequeue() {
 
 void llega_jugador(int id) {
     pthread_mutex_lock(&mutex_cola);
-    while (cant == BUFFER_SIZE) {
+    while (cant == BUFFER_SIZE && !terminar) {
         pthread_cond_wait(&not_full, &mutex_cola);
+    }
+    // si llega Ctrl+C y la cola sigue llena, el jugador que llegó ya no entra
+    if (cant == BUFFER_SIZE) {
+        pthread_mutex_unlock(&mutex_cola); 
+        return;
     }
     enqueue(id);
     pthread_cond_signal(&not_empty);
@@ -408,8 +413,13 @@ void llega_jugador(int id) {
 
 int saca_jugador() {
     pthread_mutex_lock(&mutex_cola);
-    while (cant == 0) {
+    while (cant == 0 && !terminar) {
         pthread_cond_wait(&not_empty, &mutex_cola);
+    }
+    if (cant == 0) {
+        // llega el Ctrl+C y no hay nadie esperando
+        pthread_mutex_unlock(&mutex_cola);
+        return -1;
     }
     int id = dequeue();
     pthread_cond_signal(&not_full);
