@@ -468,7 +468,7 @@ void *juez(void *arg) {
                 p->terminada = 4;
             }
         }
-        / si llego Ctrl+C, la partida termina
+        // si llego Ctrl+C, la partida termina
         if (terminar && !p->terminada) {
             p->terminada = 5;
         }
