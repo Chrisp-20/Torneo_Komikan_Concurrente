@@ -6,6 +6,8 @@
 #include <pthread.h>
 #include <semaphore.h>
 #include <unistd.h>
+#include <signal.h>
+#include <atomic>
 using namespace std;
 
 #define BUFFER_SIZE 1024
@@ -15,6 +17,8 @@ int M;
 int min_ms = 50;
 int max_ms = 300;
 int seed = 1;
+atomic<int> terminar(0); // se pondría en 1 cuando llegara Ctrl+C
+
 
 // cola de jugadores que esperan (la misma idea que pc.c)
 int cola[BUFFER_SIZE];
@@ -59,6 +63,12 @@ struct Ficha {
     int num;                 // numero del perro (0 a 11)
     unsigned int semilla;
 };
+
+// solo admin del Ctrl+C, o sea, solo avisa que hay que terminar 
+void manejar_sigint(int s) {
+    (void)s;
+    terminar = 1;
+}
 
 void leer_config(string archivo) {
     ifstream f(archivo);
@@ -555,6 +565,7 @@ int main(int argc, char *argv[]) {
     mesa_ocupada = (int *)calloc(M, sizeof(int));
     jueces = (pthread_t *)malloc((N / 2 + 1) * sizeof(pthread_t));
     sem_init(&mesas, 0, M);
+    signal(SIGINT, manejar_sigint);
 
     pthread_t mm;
     pthread_create(&mm, NULL, matchmaker, NULL);
