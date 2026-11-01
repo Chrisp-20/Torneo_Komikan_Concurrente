@@ -52,7 +52,7 @@ struct Partida {
     int pos_perro[12];
     int vivo[12];
     int capturas;
-    int terminada;           // 0 sigue, 1 gana el puma, 2 ganan los perros, 3 abandona el jugador del puma y 4 abandona el de los perros
+    int terminada;           // 0 sigue, 1 gana el puma, 2 ganan los perros, 3 abandona el jugador del puma y 4 abandona el de los perros, 5 llegó el Ctrl+C
     int movs;
     int abandona;            // 0 nadie, 1 abandona el jugador del puma, 2 el de los perros
 };
@@ -468,6 +468,10 @@ void *juez(void *arg) {
                 p->terminada = 4;
             }
         }
+        / si llego Ctrl+C, la partida termina
+        if (terminar && !p->terminada) {
+            p->terminada = 5;
+        }
         fin = p->terminada;
         if (!fin) {
             imprimir_tablero(p->mesa, p->tablero);
@@ -489,9 +493,11 @@ void *juez(void *arg) {
     } else if (p->terminada == 3) {
         printf("Mesa %d: el jugador %d (Puma) abandonó, gana el jugador %d (Perros) por abandono\n",
                p->mesa, p->jugador_puma, p->jugador_perros);
-    } else {
+    } else if (p->terminada == 4) {
         printf("Mesa %d: el jugador %d (Perros) abandonó, gana el jugador %d (Puma) por abandono\n",
                p->mesa, p->jugador_perros, p->jugador_puma);
+    } else {
+        printf("Mesa %d: partida interrumpida por Ctrl+C, %d movimientos\n", p->mesa, p->movs);
     }
 
    
