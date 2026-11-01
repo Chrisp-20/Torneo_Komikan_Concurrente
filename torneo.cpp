@@ -31,6 +31,7 @@ sem_t mesas;
 pthread_mutex_t mutex_mesas = PTHREAD_MUTEX_INITIALIZER;
 int *mesa_ocupada;
 pthread_t *jueces;
+int partidas = 0;        // partidas creadas por el matchmaker
 
 int ady[28][28];
 
@@ -507,11 +508,23 @@ void *juez(void *arg) {
 
 void *matchmaker(void *arg) {
     (void)arg;
-    for (int k = 0; k < N / 2; k++) {
+        for (int k = 0; k < N / 2 && !terminar; k++) {
         int a = saca_jugador();
-        int b = saca_jugador();
+        int b = -1;
+        if (a != -1) {
+            b = saca_jugador();
+        }
+        if (a == -1 || b == -1) {
+            break;
+        }
+    
 
         sem_wait(&mesas); 
+
+        if (terminar) {
+            sem_post(&mesas);
+            break;
+        }
 
         pthread_mutex_lock(&mutex_mesas);
         int m = 0;
@@ -531,7 +544,13 @@ void *matchmaker(void *arg) {
             p->abandona = 2;
         }
         pthread_create(&jueces[k], NULL, juez, p);
+        partidas++;
     }
+
+    // por si main estaba esperando un lugar en la cola
+    pthread_mutex_lock(&mutex_cola);
+    pthread_cond_broadcast(&not_full);
+    pthread_mutex_unlock(&mutex_cola);
     return NULL;
 }
 
