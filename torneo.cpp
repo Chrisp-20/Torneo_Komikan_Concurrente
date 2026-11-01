@@ -602,7 +602,7 @@ int main(int argc, char *argv[]) {
     sem_init(&mesas, 0, M);
     signal(SIGINT, manejar_sigint);
 
-    // bloqueamos el SIGINT antes de crear los hilos, asi todos los hilos nacen sin recibir el SIGNIT y el Ctrl+C lo recibe solo main
+    // bloqueamos el SIGINT antes de crear los hilos, asi todos los hilos nacen sin recibir el SIGINIT y el Ctrl+C lo recibe solo main
     sigset_t mascara;
     sigemptyset(&mascara);
     sigaddset(&mascara, SIGINT);
@@ -630,7 +630,7 @@ int main(int argc, char *argv[]) {
     }
 
     pthread_join(mm, NULL);
-    for (int k = 0; k < N / 2; k++) {
+    for (int k = 0; k < partidas; k++) {
         pthread_join(jueces[k], NULL);
     }
     if (N % 2 == 1 && !terminar) {
