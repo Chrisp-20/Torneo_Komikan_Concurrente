@@ -66,7 +66,7 @@ struct Ficha {
 
 // solo admin del Ctrl+C, o sea, solo avisa que hay que terminar 
 void manejar_sigint(int s) {
-    (void)s;
+    (void)s; // no usamos s, esto solo evita el warning del parámetro sin usar que aparece al compilar
     terminar = 1;
 }
 
@@ -567,8 +567,16 @@ int main(int argc, char *argv[]) {
     sem_init(&mesas, 0, M);
     signal(SIGINT, manejar_sigint);
 
+    // bloqueamos el SIGINT antes de crear los hilos, asi todos los hilos nacen sin recibir el SIGNIT y el Ctrl+C lo recibe solo main
+    sigset_t mascara;
+    sigemptyset(&mascara);
+    sigaddset(&mascara, SIGINT);
+    pthread_sigmask(SIG_BLOCK, &mascara, NULL);
+
     pthread_t mm;
     pthread_create(&mm, NULL, matchmaker, NULL);
+
+    pthread_sigmask(SIG_UNBLOCK, &mascara, NULL);
 
     for (int i = 0; i < N; i++) {
         usleep((rand() % 20) * 1000); // los jugadores llegan de a poco
