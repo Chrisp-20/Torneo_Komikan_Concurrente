@@ -78,7 +78,7 @@ El tablero tiene 28 nodos: la grilla de 5x5 más el triángulo (trono) de arriba
 El Puma gana con 6 capturas y los Perros ganan si el Puma queda sin movimientos. El Puma salta en
 línea recta, incluidas las rectas que pasan por el triángulo.
  
-## Cómo funciona:
+## Decisiones de sincronización:
  
 - **Cola de jugadores:** buffer circular con mutex y variables de condición (main produce, el matchmaker consume).
 - **Límite de mesas:** semáforo `mesas` inicializado en M.
@@ -86,9 +86,14 @@ línea recta, incluidas las rectas que pasan por el triángulo.
 - **Abandono:** el jugador marcado en `abandona` falla, el juez cierra la partida y gana el oponente por abandono.
 - **Ctrl+C:** se dejan de aceptar jugadores, las partidas en curso terminan ordenadamente y se liberan
   semáforo, mutex, variables de condición y memoria.
+
 ## Cómo probar:
  
 - Partida normal: `./torneo 2 1 config.txt`
 - Varias mesas: `./torneo 7 3 config.txt` (queda 1 jugador sin pareja)
 - Abandono: `./torneo 2 1 config_abandono.txt`
 - Ctrl+C: `./torneo 20 2 config.txt` y apretar Ctrl+C a los 2 segundos
+
+## Informe
+
+El informe de diseño y análisis está en [Informe_S_O_Tarea_2.pdf](Informe_S_O_Tarea_2.pdf).
